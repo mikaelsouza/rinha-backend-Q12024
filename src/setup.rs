@@ -19,5 +19,5 @@ pub async fn setup_address() -> TcpListener {
     let socket = SocketAddrV4::new(ip, port);
     TcpListener::bind(socket)
         .await
-        .expect(&format!("Failed to bind server to {}", ip_port))
+        .unwrap_or_else(|_| panic!("Failed to bind server to {}", ip_port))
 }
