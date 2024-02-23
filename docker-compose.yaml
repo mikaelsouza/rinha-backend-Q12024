@@ -1,6 +1,9 @@
 services:
   db:
-    image: postgres:16.2
+    image: rinha:latest
+    build: 
+      context: .
+      dockerfile: database/postgresql.Dockerfile
     restart: always
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
