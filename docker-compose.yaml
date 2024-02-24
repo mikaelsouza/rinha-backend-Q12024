@@ -7,12 +7,14 @@ services:
     restart: always
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      TZ: America/Manaus
     ports:
       - 5432:5432
-
 
   adminer:
     image: adminer
     restart: always
+    environment:
+      TZ: America/Manaus
     ports:
       - 8080:8080
