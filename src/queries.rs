@@ -1,4 +1,4 @@
-pub const CURRENT_STATEMENT: &str = r#"
+pub const CURRENT_BALANCE: &str = r#"
     SELECT
         "limit"    AS "limit",
         NOW()      AS "timestamp",
