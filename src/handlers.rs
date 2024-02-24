@@ -8,8 +8,9 @@ use sqlx::{Pool, Postgres};
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Transaction {
     valor: i64,
-    tipo: String, // TODO: Use an enum in the future
+    tipo: String, // TODO: Use an enum
     descricao: String,
+    realizada_em: String, // TODO: Use a date specific type
 }
 
 #[derive(Debug, Serialize)]
@@ -44,18 +45,11 @@ pub async fn post_transaction(
     `realizado_em` field there.
 */
 
-pub struct RecordedTransaction {
-    valor: i64,
-    tipo: String,
-    descricao: String,
-    realizado_em: String,
-}
-
 pub struct Statement {
     total: i64,
     data_extrato: String, // # TODO: Change this to a date format
     limite: i64,
-    ultimas_transacoes: Vec<RecordedTransaction>,
+    ultimas_transacoes: Vec<Transaction>,
 }
 
 impl Statement {
