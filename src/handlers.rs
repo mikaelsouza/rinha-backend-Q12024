@@ -5,7 +5,6 @@ use axum::response::IntoResponse;
 use serde::{Deserialize, Serialize};
 use sqlx::{Pool, Postgres};
 
-
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Transaction {
     valor: i64,
@@ -83,6 +82,6 @@ pub async fn get_statement(
             .await
             .unwrap();
 
-    let response = String::from(format!("{:?}", rows));
+    let response = format!("{:?}", rows);
     response
 }
