@@ -1,8 +1,10 @@
 use axum::debug_handler;
-use axum::extract::{Json, Path};
+use axum::extract::{Json, Path, State};
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use serde::{Deserialize, Serialize};
+use sqlx::{Pool, Postgres};
+
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Transaction {
@@ -19,6 +21,7 @@ pub struct TransactionResponse {
 
 #[debug_handler]
 pub async fn post_transaction(
+    State(state): State<Pool<Postgres>>,
     Path(user_id): Path<u32>,
     Json(transaction): Json<Transaction>,
 ) -> impl IntoResponse {
@@ -67,8 +70,19 @@ impl Statement {
     }
 }
 
-pub async fn get_statement(Path(user_id): Path<u32>) -> impl IntoResponse {
-    todo!();
-    let s = Statement::init();
-    (StatusCode::OK, format!(""))
+#[debug_handler]
+pub async fn get_statement(
+    State(state): State<Pool<Postgres>>,
+    Path(user_id): Path<i32>,
+) -> String {
+    let rows: Vec<(i32, i64, i64)> =
+        sqlx::query_as(r#"SELECT * FROM transactions WHERE id = $1 OR id = $2"#)
+            .bind(user_id)
+            .bind(user_id + 1)
+            .fetch_all(&state)
+            .await
+            .unwrap();
+
+    let response = String::from(format!("{:?}", rows));
+    response
 }
