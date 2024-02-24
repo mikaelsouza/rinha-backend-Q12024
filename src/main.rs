@@ -1,4 +1,5 @@
 mod handlers;
+mod queries;
 mod setup;
 
 #[tokio::main]
