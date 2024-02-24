@@ -38,7 +38,7 @@ pub async fn init_address(port: u16) -> TcpListener {
     TcpListener::bind(socket).await.unwrap()
 }
 
-pub async fn setup_db(db_password: String) -> Pool<Postgres> {
+pub async fn setup_db(db_password: &str) -> Pool<Postgres> {
     let url = format!("postgres://postgres:{}@localhost:5432/rinha", db_password);
 
     sqlx::postgres::PgPoolOptions::new()
