@@ -2,27 +2,32 @@ use crate::types::BalanceResponse;
 use crate::{queries, types};
 use axum::debug_handler;
 use axum::extract::{Json, Path, State};
-use axum::http::StatusCode;
-use axum::response::IntoResponse;
 use sqlx::{Pool, Postgres};
 
 #[debug_handler]
 pub async fn post_transaction(
     State(state): State<Pool<Postgres>>,
-    Path(user_id): Path<u32>,
+    Path(user_id): Path<i64>,
     Json(transaction): Json<types::Transaction>,
-) -> impl IntoResponse {
-    log::info!("{:?}", transaction);
-    let response = String::from("Hey!");
-    (StatusCode::OK, response)
+) -> String {
+    sqlx::query(queries::INSERT_TRANSACTION)
+        .bind(user_id)
+        .bind(&transaction.value)
+        .bind(&transaction.transaction_type)
+        .bind(&transaction.description)
+        .execute(&state)
+        .await
+        .unwrap();
+    // TODO: Finish the logic for this handler
+    serde_json::to_string(&transaction).unwrap()
 }
 
 #[debug_handler]
 pub async fn get_balance(State(state): State<Pool<Postgres>>, Path(user_id): Path<i32>) -> String {
-    let current_balance = sqlx::query_as(queries::CURRENT_BALANCE)
+    let current_balance = sqlx::query_as(queries::GET_CURRENT_BALANCE)
         .bind(user_id)
         .fetch_one(&state);
-    let previous_transactions = sqlx::query_as(queries::PREVIOUS_TRANSACTIONS)
+    let previous_transactions = sqlx::query_as(queries::GET_PREVIOUS_TRANSACTIONS)
         .bind(user_id)
         .fetch_all(&state);
     let current_balance: types::Balance = current_balance.await.unwrap();
