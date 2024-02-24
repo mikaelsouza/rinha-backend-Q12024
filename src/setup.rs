@@ -26,7 +26,7 @@ pub fn init_routes(db: Pool<Postgres>) -> Router {
             "/clientes/:user_id/transacoes",
             post(handlers::post_transaction),
         )
-        .route("/clientes/:user_id/extrato", get(handlers::get_statement))
+        .route("/clientes/:user_id/extrato", get(handlers::get_balance))
         .with_state(db)
 }
 
@@ -40,7 +40,7 @@ pub async fn init_address(port: u16) -> TcpListener {
 
 pub async fn setup_db(db_password: String) -> Pool<Postgres> {
     let url = format!("postgres://postgres:{}@localhost:5432/rinha", db_password);
-    
+
     sqlx::postgres::PgPoolOptions::new()
         .max_connections(10)
         .connect(&url)
