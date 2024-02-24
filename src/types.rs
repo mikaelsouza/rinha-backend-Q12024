@@ -30,7 +30,7 @@ pub struct Balance {
     #[serde(rename = "total")]
     pub balance: i64,
     #[serde(rename = "data_extrato", with = "time::serde::rfc3339")]
-    pub timestamp: OffsetDateTime, // # TODO: Change this to a date format
+    pub timestamp: OffsetDateTime,
     #[serde(rename = "limite")]
     pub limit: i64,
 }
