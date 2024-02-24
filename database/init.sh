@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
-
+# TODO: Change timezone if necessary
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
+    SET TIMEZONE='America/Manaus';
     CREATE DATABASE rinha;
     \c rinha
     CREATE TABLE "accounts" (
