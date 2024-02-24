@@ -1,16 +1,37 @@
+use crate::queries;
 use axum::debug_handler;
 use axum::extract::{Json, Path, State};
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use serde::{Deserialize, Serialize};
-use sqlx::{Pool, Postgres};
+use sqlx::prelude::FromRow;
+use sqlx::{Pool, Postgres, Type};
+use time::OffsetDateTime;
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Type, Debug, Serialize, Deserialize)]
+#[sqlx(type_name = "transaction_type", rename_all = "lowercase")]
+enum TransactionType {
+    C,
+    D,
+}
+
+#[derive(Debug, Deserialize, Serialize, FromRow)]
 pub struct Transaction {
-    valor: i64,
-    tipo: String, // TODO: Use an enum
-    descricao: String,
-    realizada_em: String, // TODO: Use a date specific type
+    value: i64,
+    transaction_type: TransactionType,
+    description: String,
+    timestamp: OffsetDateTime,
+}
+#[derive(Debug, Deserialize, Serialize, FromRow)]
+pub struct Statement {
+    balance: i64,
+    timestamp: OffsetDateTime, // # TODO: Change this to a date format
+    limit: i64,
+}
+
+pub struct StatementResponse {
+    statement: Statement,
+    previous_transactions: Vec<Transaction>,
 }
 
 #[derive(Debug, Serialize)]
@@ -45,37 +66,23 @@ pub async fn post_transaction(
     `realizado_em` field there.
 */
 
-pub struct Statement {
-    total: i64,
-    data_extrato: String, // # TODO: Change this to a date format
-    limite: i64,
-    ultimas_transacoes: Vec<Transaction>,
-}
-
-impl Statement {
-    fn init() -> Self {
-        Self {
-            total: 0,
-            data_extrato: String::from(""),
-            limite: 0,
-            ultimas_transacoes: Vec::new(),
-        }
-    }
-}
-
 #[debug_handler]
 pub async fn get_statement(
     State(state): State<Pool<Postgres>>,
     Path(user_id): Path<i32>,
 ) -> String {
-    let rows: Vec<(i32, i64, i64)> =
-        sqlx::query_as(r#"SELECT * FROM transactions WHERE id = $1 OR id = $2"#)
-            .bind(user_id)
-            .bind(user_id + 1)
-            .fetch_all(&state)
-            .await
-            .unwrap();
+    let current_statement: Statement = sqlx::query_as(queries::CURRENT_STATEMENT)
+        .bind(user_id)
+        .fetch_one(&state)
+        .await
+        .unwrap();
 
-    let response = format!("{:?}", rows);
+    let previous_transactions: Vec<Transaction> = sqlx::query_as(queries::PREVIOUS_TRANSACTIONS)
+        .bind(user_id)
+        .fetch_all(&state)
+        .await
+        .unwrap();
+
+    let response = format!("{:?}, {:?}", current_statement, previous_transactions);
     response
 }
