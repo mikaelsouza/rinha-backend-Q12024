@@ -4,6 +4,7 @@ use sqlx::Type;
 use time::OffsetDateTime;
 #[derive(Type, Debug, Serialize, Deserialize)]
 #[sqlx(type_name = "transaction_type", rename_all = "lowercase")]
+#[serde(rename_all = "lowercase")]
 pub enum TransactionType {
     C,
     D,
@@ -12,27 +13,31 @@ pub enum TransactionType {
 #[derive(Debug, Deserialize, Serialize, FromRow)]
 pub struct Transaction {
     #[serde(rename = "valor")]
-    value: i64,
+    pub value: i64,
     #[serde(rename = "tipo")]
-    transaction_type: TransactionType,
+    pub transaction_type: TransactionType,
     #[serde(rename = "descricao")]
-    description: String,
-    #[serde(default = "OffsetDateTime::now_utc")]
-    timestamp: OffsetDateTime,
+    pub description: String,
+    #[serde(
+        default = "OffsetDateTime::now_utc",
+        rename(serialize = "realizada_em"),
+        with = "time::serde::rfc3339"
+    )]
+    pub timestamp: OffsetDateTime,
 }
 #[derive(Debug, Deserialize, Serialize, FromRow)]
 pub struct Balance {
     #[serde(rename = "total")]
-    total: i64,
-    #[serde(rename = "data_extrato")]
-    timestamp: OffsetDateTime, // # TODO: Change this to a date format
+    pub balance: i64,
+    #[serde(rename = "data_extrato", with = "time::serde::rfc3339")]
+    pub timestamp: OffsetDateTime, // # TODO: Change this to a date format
     #[serde(rename = "limite")]
-    limit: i64,
+    pub limit: i64,
 }
 #[derive(Serialize, Deserialize)]
 pub struct BalanceResponse {
     #[serde(rename = "saldo")]
-    balance: Balance,
+    pub balance: Balance,
     #[serde(rename = "ultimas_transacoes")]
-    previous_transactions: Vec<Transaction>,
+    pub previous_transactions: Vec<Transaction>,
 }

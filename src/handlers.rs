@@ -1,3 +1,4 @@
+use crate::types::BalanceResponse;
 use crate::{queries, types};
 use axum::debug_handler;
 use axum::extract::{Json, Path, State};
@@ -18,7 +19,6 @@ pub async fn post_transaction(
 
 #[debug_handler]
 pub async fn get_balance(State(state): State<Pool<Postgres>>, Path(user_id): Path<i32>) -> String {
-    // Logic for solving the problem
     let current_balance = sqlx::query_as(queries::CURRENT_BALANCE)
         .bind(user_id)
         .fetch_one(&state);
@@ -27,9 +27,10 @@ pub async fn get_balance(State(state): State<Pool<Postgres>>, Path(user_id): Pat
         .fetch_all(&state);
     let current_balance: types::Balance = current_balance.await.unwrap();
     let previous_transactions: Vec<types::Transaction> = previous_transactions.await.unwrap();
-
-    // Generating final response
-
-    let response = format!("{:?}, {:?}", current_balance, previous_transactions);
+    let balance_response = BalanceResponse {
+        balance: current_balance,
+        previous_transactions,
+    };
+    let response = serde_json::to_string(&balance_response).unwrap();
     response
 }
