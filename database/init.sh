@@ -22,10 +22,14 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
         "id" serial NOT NULL,
         "account_id" serial NOT NULL,
         "value" bigint NOT NULL,
-        "type" transaction_type NOT NULL,
+        "transaction_type" transaction_type NOT NULL,
         "description" text NOT NULL,
-        "timestamp" timestamp NOT NULL DEFAULT NOW(),
+        "timestamp" timestamptz NOT NULL DEFAULT NOW(),
         PRIMARY KEY ("id"),
         FOREIGN KEY("account_id") REFERENCES accounts(id)
-    )
+    );
+    INSERT INTO "transactions" ("account_id", "value", "transaction_type", "description", "timestamp")
+    VALUES (1, '10000', 'c', 'sdadsa', now()),
+           (1, '10000', 'd', 'sdadsa', now()),
+           (2, '10000', 'c', 'sdadsa', now());
 EOSQL
