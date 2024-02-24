@@ -1,9 +1,18 @@
-// sqlx::query(r#"INSERT INTO "table1" ("val1", "val2") VALUES ('1', '3')"#)
-// .execute(&pool)
-// .await
-// .unwrap();
-
-// let row: (i32, i32, i32) = sqlx::query_as("SELECT * FROM table1")
-// .fetch_one(&pool)
-// .await
-// .unwrap();
+pub const CURRENT_STATEMENT: &str = r#"
+    SELECT
+        "limit"    AS "limit",
+        NOW()      AS "timestamp",
+        balance    AS "balance"
+    FROM accounts
+    WHERE id = $1
+"#;
+pub const PREVIOUS_TRANSACTIONS: &str = r#"
+    SELECT
+        value               AS "value",
+        transaction_type    AS "transaction_type",
+        description         AS "description",
+        timestamp           AS "timestamp"
+    FROM transactions
+    WHERE account_id = $1
+    ORDER BY timestamp DESC
+"#;
