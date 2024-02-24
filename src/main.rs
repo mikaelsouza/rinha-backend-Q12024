@@ -1,6 +1,7 @@
 mod handlers;
 mod queries;
 mod setup;
+mod types;
 
 #[tokio::main]
 async fn main() {
