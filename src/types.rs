@@ -1,16 +1,16 @@
 use serde::{Deserialize, Serialize};
-use sqlx::prelude::FromRow;
 use sqlx::Type;
 use time::OffsetDateTime;
+
 #[derive(Type, Debug, Serialize, Deserialize)]
-#[sqlx(type_name = "transaction_type", rename_all = "lowercase")]
 #[serde(rename_all = "lowercase")]
+#[sqlx(type_name = "transaction_type")]
 pub enum TransactionType {
     C,
     D,
 }
 
-#[derive(Debug, Deserialize, Serialize, FromRow)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Transaction {
     #[serde(rename = "valor")]
     pub value: i64,
@@ -25,7 +25,7 @@ pub struct Transaction {
     )]
     pub timestamp: OffsetDateTime,
 }
-#[derive(Debug, Deserialize, Serialize, FromRow)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Balance {
     #[serde(rename = "total")]
     pub balance: i64,
