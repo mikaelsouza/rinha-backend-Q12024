@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::Type;
 use time::OffsetDateTime;
 
-#[derive(Type, Debug, Serialize, Deserialize)]
+#[derive(Type, Debug, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "lowercase")]
 #[sqlx(type_name = "transaction_type")]
 pub enum TransactionType {
