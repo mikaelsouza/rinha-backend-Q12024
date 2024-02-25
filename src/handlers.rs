@@ -31,6 +31,6 @@ pub async fn get_balance(State(pool): State<Pool<Postgres>>, Path(user_id): Path
         balance: current_balance,
         previous_transactions,
     };
-    let response = serde_json::to_string(&balance_response).unwrap();
-    response
+
+    serde_json::to_string(&balance_response).unwrap()
 }
