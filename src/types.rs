@@ -25,6 +25,14 @@ pub struct Transaction {
     )]
     pub timestamp: OffsetDateTime,
 }
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct TransactionResponse {
+    #[serde(rename = "valor")]
+    pub balance: i64,
+    #[serde(rename = "limite")]
+    pub limit: i64,
+}
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Balance {
     #[serde(rename = "total")]
