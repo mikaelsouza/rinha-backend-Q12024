@@ -1,7 +1,7 @@
 use crate::types;
-use sqlx::{Pool, Postgres};
+use sqlx::postgres::PgExecutor;
 
-pub async fn get_current_balance(user_id: i64, pool: &Pool<Postgres>) -> types::Balance {
+pub async fn get_current_balance(user_id: i64, executor: impl PgExecutor<'_>) -> types::Balance {
     sqlx::query_as!(
         types::Balance,
         r#"
@@ -14,7 +14,7 @@ pub async fn get_current_balance(user_id: i64, pool: &Pool<Postgres>) -> types::
         "#,
         user_id
     )
-    .fetch_one(pool)
+    .fetch_one(executor)
     .await
     .unwrap()
 }
@@ -22,7 +22,7 @@ pub async fn get_current_balance(user_id: i64, pool: &Pool<Postgres>) -> types::
 pub async fn get_previous_transactions(
     user_id: i64,
     num_of_results: i64,
-    pool: &Pool<Postgres>,
+    executor: impl PgExecutor<'_>,
 ) -> Vec<types::Transaction> {
     sqlx::query_as!(
         types::Transaction,
@@ -40,7 +40,7 @@ pub async fn get_previous_transactions(
         user_id,
         num_of_results
     )
-    .fetch_all(pool)
+    .fetch_all(executor)
     .await
     .unwrap()
 }
@@ -48,7 +48,7 @@ pub async fn get_previous_transactions(
 pub async fn insert_transaction(
     user_id: i64,
     transaction: types::Transaction,
-    pool: &Pool<Postgres>,
+    executor: impl PgExecutor<'_>,
 ) {
     sqlx::query!(
         r#"
@@ -62,12 +62,12 @@ pub async fn insert_transaction(
         transaction.transaction_type as types::TransactionType,
         transaction.description
     )
-    .execute(pool)
+    .execute(executor)
     .await
     .unwrap();
 }
 
-pub async fn set_new_balance(user_id: i64, new_balance: i64, pool: &Pool<Postgres>) {
+pub async fn set_new_balance(user_id: i64, new_balance: i64, executor: impl PgExecutor<'_>) {
     sqlx::query!(
         r#"
         UPDATE accounts
@@ -77,7 +77,7 @@ pub async fn set_new_balance(user_id: i64, new_balance: i64, pool: &Pool<Postgre
         new_balance,
         user_id
     )
-    .execute(pool)
+    .execute(executor)
     .await
     .unwrap();
 }

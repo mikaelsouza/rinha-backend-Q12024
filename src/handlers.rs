@@ -16,8 +16,11 @@ pub async fn post_transaction(
     if new_balance < limit {
         return String::from("Sheesh");
     }
-    queries::insert_transaction(user_id, transaction, &pool).await;
-    queries::set_new_balance(user_id, new_balance, &pool).await;
+
+    let mut db_transaction = pool.begin().await.unwrap();
+    queries::insert_transaction(user_id, transaction, &mut *db_transaction).await;
+    queries::set_new_balance(user_id, new_balance, &mut *db_transaction).await;
+    db_transaction.commit().await.unwrap();
     let current_balance = queries::get_current_balance(user_id, &pool).await;
     assert_eq!(new_balance, current_balance.balance);
     String::from("Tudo show de bola!")
