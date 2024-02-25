@@ -22,7 +22,7 @@ pub async fn get_current_balance(user_id: i64, pool: &Pool<Postgres>) -> types::
 pub async fn get_previous_transactions(
     user_id: i64,
     num_of_results: i64,
-    state: &Pool<Postgres>,
+    pool: &Pool<Postgres>,
 ) -> Vec<types::Transaction> {
     sqlx::query_as!(
         types::Transaction,
@@ -40,7 +40,7 @@ pub async fn get_previous_transactions(
         user_id,
         num_of_results
     )
-    .fetch_all(state)
+    .fetch_all(pool)
     .await
     .unwrap()
 }
@@ -48,7 +48,7 @@ pub async fn get_previous_transactions(
 pub async fn insert_transaction(
     user_id: i64,
     transaction: types::Transaction,
-    state: &Pool<Postgres>,
+    pool: &Pool<Postgres>,
 ) {
     sqlx::query!(
         r#"
@@ -62,12 +62,12 @@ pub async fn insert_transaction(
         transaction.transaction_type as types::TransactionType,
         transaction.description
     )
-    .execute(state)
+    .execute(pool)
     .await
     .unwrap();
 }
 
-pub async fn set_new_balance(user_id: i64, new_balance: i64, state: &Pool<Postgres>) {
+pub async fn set_new_balance(user_id: i64, new_balance: i64, pool: &Pool<Postgres>) {
     sqlx::query!(
         r#"
         UPDATE accounts
@@ -77,7 +77,7 @@ pub async fn set_new_balance(user_id: i64, new_balance: i64, state: &Pool<Postgr
         new_balance,
         user_id
     )
-    .execute(state)
+    .execute(pool)
     .await
     .unwrap();
 }
