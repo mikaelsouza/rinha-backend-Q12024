@@ -6,7 +6,7 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
     CREATE DATABASE rinha;
     \c rinha
     CREATE TABLE "accounts" (
-        "id" serial NOT NULL,
+        "id" bigserial NOT NULL,
         "limit" bigint NOT NULL,
         "balance" bigint NOT NULL,
         PRIMARY KEY ("id")
@@ -19,8 +19,8 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
        (500000, 0);
     CREATE TYPE transaction_type as ENUM ('c', 'd');
     CREATE TABLE "transactions" (
-        "id" serial NOT NULL,
-        "account_id" serial NOT NULL,
+        "id" bigserial NOT NULL,
+        "account_id" bigserial NOT NULL,
         "value" bigint NOT NULL,
         "transaction_type" transaction_type NOT NULL,
         "description" text NOT NULL,
