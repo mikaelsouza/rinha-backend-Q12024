@@ -17,7 +17,7 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
        (1000000, 0),
        (10000000, 0),
        (500000, 0);
-    CREATE TYPE transaction_type as ENUM ('c', 'd');
+    CREATE TYPE transaction_type as ENUM ('C', 'D');
     CREATE TABLE "transactions" (
         "id" bigserial NOT NULL,
         "account_id" bigserial NOT NULL,
@@ -29,7 +29,7 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
         FOREIGN KEY("account_id") REFERENCES accounts(id)
     );
     INSERT INTO "transactions" ("account_id", "value", "transaction_type", "description", "timestamp")
-    VALUES (1, '10000', 'c', 'sdadsa', now()),
-           (1, '10000', 'd', 'sdadsa', now()),
-           (2, '10000', 'c', 'sdadsa', now());
+    VALUES (1, '10000', 'C', 'sdadsa', now()),
+           (1, '10000', 'D', 'sdadsa', now()),
+           (2, '10000', 'C', 'sdadsa', now());
 EOSQL
