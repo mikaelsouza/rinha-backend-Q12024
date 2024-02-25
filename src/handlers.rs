@@ -26,7 +26,7 @@ pub async fn post_transaction(
 #[debug_handler]
 pub async fn get_balance(State(pool): State<Pool<Postgres>>, Path(user_id): Path<i64>) -> String {
     let current_balance = queries::get_current_balance(user_id, &pool).await;
-    let previous_transactions = queries::get_previous_transactions(user_id, &pool).await;
+    let previous_transactions = queries::get_previous_transactions(user_id, 10, &pool).await;
     let balance_response = types::BalanceResponse {
         balance: current_balance,
         previous_transactions,

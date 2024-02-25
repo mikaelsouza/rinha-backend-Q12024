@@ -21,6 +21,7 @@ pub async fn get_current_balance(user_id: i64, pool: &Pool<Postgres>) -> types::
 
 pub async fn get_previous_transactions(
     user_id: i64,
+    num_of_results: i64,
     state: &Pool<Postgres>,
 ) -> Vec<types::Transaction> {
     sqlx::query_as!(
@@ -34,8 +35,10 @@ pub async fn get_previous_transactions(
         FROM transactions
         WHERE account_id = $1
         ORDER BY timestamp DESC
+        LIMIT $2
         "#,
-        user_id
+        user_id,
+        num_of_results
     )
     .fetch_all(state)
     .await
