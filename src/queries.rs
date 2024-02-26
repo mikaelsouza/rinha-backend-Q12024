@@ -95,10 +95,7 @@ pub async fn check_user_exists(user_id: i64, executor: impl PgExecutor<'_>) -> b
     )
     .fetch_one(executor)
     .await;
-    match query_result {
-        Ok(_) => return true,
-        Err(_) => return false,
-    }
+    query_result.is_ok()
 }
 
 pub async fn add_transaction(

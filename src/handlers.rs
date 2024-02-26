@@ -12,7 +12,7 @@ pub async fn post_transaction(
     Path(user_id): Path<i64>,
     Json(transaction): Json<types::Transaction>,
 ) -> impl IntoResponse {
-    if queries::check_user_exists(user_id, &pool).await == false {
+    if !(queries::check_user_exists(user_id, &pool).await) {
         return (StatusCode::NOT_FOUND, String::from("{}"));
     }
 
