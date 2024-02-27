@@ -10,6 +10,11 @@ pub enum TransactionType {
     D,
 }
 
+pub enum Error {
+    UserNotFound,
+    InconsistentResult,
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Transaction {
     #[serde(rename = "valor")]
