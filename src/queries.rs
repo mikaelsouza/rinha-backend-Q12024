@@ -8,13 +8,13 @@ impl Statement {
         sqlx::query_as!(
             types::Balance,
             r#"
-        SELECT
-            "limit"    AS "limit",
-            NOW()      AS "timestamp!",
-            balance    AS "balance"
-        FROM accounts
-        WHERE id = $1
-        "#,
+                SELECT
+                "limit"    AS "limit",
+                NOW()      AS "timestamp!",
+                balance    AS "balance"
+                FROM accounts
+                WHERE id = $1
+            "#,
             user_id
         )
         .fetch_one(&mut **tx)
@@ -29,15 +29,15 @@ impl Statement {
         sqlx::query_as!(
             types::Transaction,
             r#"
-        SELECT
-            value               AS "value",
-            transaction_type    AS "transaction_type!: types::TransactionType",
-            description         AS "description",
-            timestamp           AS "timestamp"
-        FROM transactions
-        WHERE account_id = $1
-        ORDER BY timestamp DESC
-        LIMIT $2
+                SELECT
+                    value               AS "value",
+                    transaction_type    AS "transaction_type!: types::TransactionType",
+                    description         AS "description",
+                    timestamp           AS "timestamp"
+                FROM transactions
+                WHERE account_id = $1
+                ORDER BY timestamp DESC
+                LIMIT $2
         "#,
             user_id,
             num_of_results
@@ -141,7 +141,7 @@ impl Transaction {
         .fetch_one(&mut **tx)
         .await;
         match balance {
-            Ok(b) => return Ok(b),
+            Ok(b) => Ok(b),
             Err(sqlx::Error::RowNotFound) => Err(types::Error::InconsistentResult),
             Err(_) => panic!(),
         }
@@ -154,10 +154,6 @@ pub async fn add_transaction(
 ) -> Result<types::Balance, types::Error> {
     let mut tx = executor.begin().await.unwrap();
     Transaction::lock_accounts(&mut tx).await;
-    match Transaction::user_exists(user_id, &mut tx).await {
-        Err(x) => return Err(x),
-        Ok(_) => {}
-    };
-    let balance = Transaction::push_transaction(user_id, transaction, &mut tx).await;
-    balance
+    Transaction::user_exists(user_id, &mut tx).await?;
+    Transaction::push_transaction(user_id, transaction, &mut tx).await
 }
