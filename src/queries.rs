@@ -155,5 +155,7 @@ pub async fn add_transaction(
     let mut tx = executor.begin().await.unwrap();
     Transaction::lock_accounts(&mut tx).await;
     Transaction::user_exists(user_id, &mut tx).await?;
-    Transaction::push_transaction(user_id, transaction, &mut tx).await
+    let balance = Transaction::push_transaction(user_id, transaction, &mut tx).await;
+    tx.commit().await.unwrap();
+    balance
 }
