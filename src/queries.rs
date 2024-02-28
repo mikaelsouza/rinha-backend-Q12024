@@ -5,18 +5,17 @@ impl Statement {
         user_id: i64,
         tx: &mut sqlx::Transaction<'_, sqlx::postgres::Postgres>,
     ) -> Result<types::Balance, sqlx::Error> {
-        sqlx::query_as!(
-            types::Balance,
+        sqlx::query_as(
             r#"
                 SELECT
                 "limit"    AS "limit",
-                NOW()      AS "timestamp!",
+                NOW()      AS "timestamp",
                 balance    AS "balance"
                 FROM accounts
                 WHERE id = $1
             "#,
-            user_id
         )
+        .bind(user_id)
         .fetch_one(&mut **tx)
         .await
     }
@@ -26,12 +25,11 @@ impl Statement {
         num_of_results: i64,
         tx: &mut sqlx::Transaction<'_, sqlx::postgres::Postgres>,
     ) -> Result<Vec<types::Transaction>, sqlx::Error> {
-        sqlx::query_as!(
-            types::Transaction,
+        sqlx::query_as(
             r#"
                 SELECT
                     value               AS "value",
-                    transaction_type    AS "transaction_type!: types::TransactionType",
+                    transaction_type    AS "transaction_type",
                     description         AS "description",
                     timestamp           AS "timestamp"
                 FROM transactions
@@ -39,9 +37,9 @@ impl Statement {
                 ORDER BY timestamp DESC
                 LIMIT $2
         "#,
-            user_id,
-            num_of_results
         )
+        .bind(user_id)
+        .bind(num_of_results)
         .fetch_all(&mut **tx)
         .await
     }
@@ -56,7 +54,10 @@ pub async fn get_balance_and_transactions(
     let cur_balance = match Statement::get_current_balance(user_id, &mut tx).await {
         Ok(balance) => balance,
         Err(sqlx::Error::RowNotFound) => return Err(types::Error::UserNotFound),
-        Err(_) => panic!(),
+        Err(e) => {
+            println!("{}", e);
+            panic!()
+        }
     };
     let transactions = Statement::get_previous_transactions(user_id, num_of_results, &mut tx)
         .await
@@ -71,10 +72,10 @@ impl Transaction {
         user_id: i64,
         tx: &mut sqlx::Transaction<'_, sqlx::postgres::Postgres>,
     ) -> Result<(), types::Error> {
-        let r = sqlx::query!(
-            r#"SELECT balance, NOW() as "timestamp!", "limit" FROM accounts WHERE id = $1"#,
-            user_id
+        let r = sqlx::query(
+            r#"SELECT balance, NOW() as "timestamp", "limit" FROM accounts WHERE id = $1"#,
         )
+        .bind(user_id)
         .fetch_one(&mut **tx)
         .await;
 
@@ -86,10 +87,10 @@ impl Transaction {
     }
 
     async fn lock_accounts(tx: &mut sqlx::Transaction<'_, sqlx::postgres::Postgres>) {
-        sqlx::query!(
+        sqlx::query(
             r#"
-        LOCK TABLE accounts IN ROW EXCLUSIVE MODE
-        "#
+            LOCK TABLE accounts IN ROW EXCLUSIVE MODE
+            "#,
         )
         .execute(&mut **tx)
         .await
@@ -100,7 +101,7 @@ impl Transaction {
         transaction: types::Transaction,
         tx: &mut sqlx::Transaction<'_, sqlx::postgres::Postgres>,
     ) -> Result<types::Balance, types::Error> {
-        let balance = sqlx::query_as!(types::Balance,
+        let balance = sqlx::query_as(
             r#"
             WITH account_info AS (
                 SELECT balance, "limit"
@@ -132,18 +133,21 @@ impl Transaction {
                 WHERE EXISTS (SELECT 1 FROM inserted_transaction) AND id = $1
                 RETURNING balance, "limit"
             )
-            SELECT *, NOW() AS "timestamp!" FROM update_balance;"#,
-            user_id,
-            transaction.value,
-            transaction.transaction_type as types::TransactionType,
-            transaction.description
+            SELECT *, NOW() AS "timestamp" FROM update_balance;"#,
         )
+        .bind(user_id)
+        .bind(transaction.value)
+        .bind(transaction.transaction_type as types::TransactionType)
+        .bind(transaction.description)
         .fetch_one(&mut **tx)
         .await;
         match balance {
             Ok(b) => Ok(b),
             Err(sqlx::Error::RowNotFound) => Err(types::Error::InconsistentResult),
-            Err(_) => panic!(),
+            Err(error) => {
+                println!("{}", error);
+                panic!()
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use sqlx::prelude::FromRow;
 use sqlx::Type;
 use time::OffsetDateTime;
 
@@ -15,7 +16,7 @@ pub enum Error {
     InconsistentResult,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, FromRow)]
 pub struct Transaction {
     #[serde(rename = "valor")]
     pub value: i64,
@@ -38,7 +39,7 @@ pub struct TransactionResponse {
     #[serde(rename = "limite")]
     pub limit: i64,
 }
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, FromRow)]
 pub struct Balance {
     #[serde(rename = "total")]
     pub balance: i64,
