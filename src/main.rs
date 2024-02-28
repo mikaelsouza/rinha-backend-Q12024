@@ -10,7 +10,7 @@ async fn main() {
         .init();
 
     let config = setup::init_environment();
-    let database = setup::setup_db(&config.db_password).await;
+    let database = setup::setup_db(&config).await;
     let routes = setup::init_routes(database);
     let address = setup::init_address(config.http_port).await;
     axum::serve(address, routes).await.unwrap();
