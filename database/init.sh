@@ -23,7 +23,7 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
         "account_id" bigserial NOT NULL,
         "value" bigint NOT NULL,
         "transaction_type" transaction_type NOT NULL,
-        "description" text NOT NULL,
+        "description" varchar(10) NOT NULL,
         "timestamp" timestamptz NOT NULL DEFAULT NOW(),
         PRIMARY KEY ("id"),
         FOREIGN KEY("account_id") REFERENCES accounts(id)

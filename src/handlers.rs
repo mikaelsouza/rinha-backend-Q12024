@@ -9,8 +9,9 @@ use sqlx::{Pool, Postgres};
 pub async fn post_transaction(
     State(pool): State<Pool<Postgres>>,
     Path(user_id): Path<i64>,
-    Json(transaction): Json<types::Transaction>,
+    Json(mut transaction): Json<types::Transaction>,
 ) -> impl IntoResponse {
+    transaction.description.truncate(10);
     let add_transaction = queries::add_transaction(user_id, transaction, &pool).await;
     let current_balance = match add_transaction {
         Ok(balance) => balance,
