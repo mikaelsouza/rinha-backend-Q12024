@@ -36,7 +36,7 @@ impl Statement {
                 WHERE account_id = $1
                 ORDER BY timestamp DESC
                 LIMIT $2
-        "#,
+            "#,
         )
         .bind(user_id)
         .bind(num_of_results)
