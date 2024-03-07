@@ -19,15 +19,15 @@ services:
     ports:
       - 8080:8080
 
-  app:
-    image: rinha-app:latest
-    build:
-      context: .
-      dockerfile: Dockerfile
-    restart: always
-    environment:
-      DB_HOST: db
-    depends_on:
-      - db
-    ports:
-      - 8099:8099
+  # app:
+  #   image: rinha-app:latest
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   restart: always
+  #   environment:
+  #     DB_HOST: db
+  #   depends_on:
+  #     - db
+  #   ports:
+  #     - 8099:8099
