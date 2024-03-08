@@ -1,3 +1,3 @@
-.PHONY: db
-db: 
-	docker compose down && docker compose up --build
+.PHONY: run
+run: 
+	docker compose down && cargo build --release && docker compose up --build
