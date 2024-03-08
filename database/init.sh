@@ -28,8 +28,4 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
         PRIMARY KEY ("id"),
         FOREIGN KEY("account_id") REFERENCES accounts(id)
     );
-    INSERT INTO "transactions" ("account_id", "value", "transaction_type", "description", "timestamp")
-    VALUES (1, '10000', 'C', 'sdadsa', now()),
-           (1, '10000', 'D', 'sdadsa', now()),
-           (2, '10000', 'C', 'sdadsa', now());
 EOSQL
