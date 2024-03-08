@@ -6,11 +6,11 @@ services:
     environment:
       DB_HOST: db
       HTTP_PORT: 8080
-    # deploy:
-    #   resources:
-    #     limits:
-    #       cpus: "0.35"
-    #       memory: "25MB"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.35"
+          memory: "20MB"
 
   api02:
     <<: *api
@@ -24,11 +24,11 @@ services:
     depends_on:
       - api01
       - api02
-    # deploy:
-    #   resources:
-    #     limits:
-    #       cpus: "0.25"
-    #       memory: "100MB"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: "100MB"
 
   db:
     image: mikaelsouza/rinha-db:latest
@@ -38,8 +38,16 @@ services:
       TZ: America/Manaus
     ports:
       - 5432:5432
-    # deploy:
-    #   resources:
-    #     limits:
-    #       cpus: "0.55"
-    #       memory: "400MB"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.55"
+          memory: "400MB"
+
+  adminer:
+    image: adminer
+    restart: always
+    environment:
+      TZ: America/Manaus
+    ports:
+      - 8080:8080

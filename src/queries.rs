@@ -88,8 +88,8 @@ impl Transaction {
     async fn lock_accounts(tx: &mut sqlx::Transaction<'_, sqlx::postgres::Postgres>) {
         sqlx::query!(
             r#"
-        LOCK TABLE accounts IN ROW EXCLUSIVE MODE
-        "#
+            LOCK TABLE accounts IN SHARE ROW EXCLUSIVE MODE;
+            "#
         )
         .execute(&mut **tx)
         .await
