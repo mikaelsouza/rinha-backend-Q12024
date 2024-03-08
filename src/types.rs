@@ -33,7 +33,7 @@ pub struct Transaction {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct TransactionResponse {
-    #[serde(rename = "valor")]
+    #[serde(rename = "saldo")]
     pub balance: i64,
     #[serde(rename = "limite")]
     pub limit: i64,
