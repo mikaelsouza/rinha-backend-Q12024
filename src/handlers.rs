@@ -9,9 +9,11 @@ use sqlx::{Pool, Postgres};
 pub async fn post_transaction(
     State(pool): State<Pool<Postgres>>,
     Path(user_id): Path<i64>,
-    Json(mut transaction): Json<types::Transaction>,
+    Json(transaction): Json<types::Transaction>,
 ) -> impl IntoResponse {
-    transaction.description.truncate(10);
+    if transaction.description.is_empty() || transaction.description.len() > 10{
+        return (StatusCode::UNPROCESSABLE_ENTITY, String::from("{}"))
+    }
     let add_transaction = queries::add_transaction(user_id, transaction, &pool).await;
     let current_balance = match add_transaction {
         Ok(balance) => balance,
